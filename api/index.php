@@ -18,11 +18,11 @@ $app->post('/login', function (ServerRequestInterface $request, ResponseInterfac
             $db = getDB();
             $stmt = $db->prepare($query);
             $stmt->execute([':username' => $user, ':password' => $pwd]);
-            $user_id = $stmt->fetch();
-            $user_id = json_encode($user_id);
+            $check = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $db = null;
 
-            if ($user_id) {
+            if (!empty($check)) {
+                $user_id = json_encode($check[0]);
                 return $response->withJSON($user_id);
             } else {
                 return $response->withStatus(401);
@@ -71,8 +71,7 @@ $app->post('/register', function (ServerRequestInterface $request, ResponseInter
 });
 
 $app->post('/history', function (ServerRequestInterface $request, ResponseInterface $response) {
-    //$userID = $request->getParsedBody()['user_id'];
-    $userID= "1";
+    $userID = $request->getParsedBody()['user_id'];
     $placeID = $request->getParsedBody()['place_id'];
 
     if (isset($userID) && isset($placeID)) {
