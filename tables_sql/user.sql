@@ -1,3 +1,5 @@
+-- This table must be imported first
+
 CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
   `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -12,4 +14,3 @@ ALTER TABLE `user`
 
 ALTER TABLE `user`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
-
