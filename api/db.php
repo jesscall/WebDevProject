@@ -1,9 +1,11 @@
 <?php
+require_once("dbconfig.php");
+
 function getDB() {
-    $dbhost="127.0.0.1";
-    $dbuser="root";
-    $dbpass="jess53561";
-    $dbname="project";
+    $dbhost = DB_HOST;
+    $dbuser = DB_USER;
+    $dbpass = DB_PASS;
+    $dbname = DB_NAME;
 
     $dbConnection = new PDO(
         "mysql:host=$dbhost;dbname=$dbname",

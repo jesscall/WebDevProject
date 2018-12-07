@@ -6,9 +6,16 @@ use Psr\Http\Message\ResponseInterface;
 
 $app = new Slim\App;
 
+$app->options('/login', function ($req, $res) {
+    return $res
+        ->withHeader('Access-Control-Allow-Headers', 'authorization,content-type');
+});
 $app->post('/login', function (ServerRequestInterface $request, ResponseInterface $response) {
     $user = $request->getParsedBody()['username'];
     $pwd = $request->getParsedBody()['password'];
+
+    $response = $response
+        ->withHeader('Access-Control-Allow-Headers', 'authorization,content-type');
 
     if (isset($user) && isset($pwd)) {
         $query = "SELECT user_id FROM user 
@@ -57,17 +64,20 @@ $app->post('/register', function (ServerRequestInterface $request, ResponseInter
             $db = null;
 
             if ($status) {
-                return $response->withStatus(200);
+                return $response->withStatus(202);
             } else {
-                return $response->withStatus(401);
+                return $response->withStatus(500);
             }
         } catch (PDOException $e) {
-            echo '{"error":{"text":' . $e->getMessage() . '}}';
+            return $response->withJson([
+                "error" => [
+                    "text" => $e->getMessage()
+                ]
+            ]);
         }
     } else {
-        return $response->withStatus(401);
+        return $response->withStatus(400);
     }
-    return $response->withStatus(200);
 });
 
 $app->post('/history', function (ServerRequestInterface $request, ResponseInterface $response) {
@@ -101,6 +111,10 @@ $app->post('/history', function (ServerRequestInterface $request, ResponseInterf
         return $response->withStatus(401);
     }
     return $response->withStatus(200);
+});
+
+$app->get('/', function ($req, $res) {
+    return $res->withJson([ "hello" => "world" ]);
 });
 
 $app->run();
