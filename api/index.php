@@ -8,17 +8,17 @@ $app = new Slim\App;
 
 
 $app->post('/login', function (ServerRequestInterface $request, ResponseInterface $response) {
-    $user = $request->getParsedBody()['username'];
+    $email = $request->getParsedBody()['emailAddress'];
     $pwd = $request->getParsedBody()['password'];
 
-    if (isset($user) && isset($pwd)) {
-        $query = "SELECT user_id FROM user
-          WHERE email_address=:username AND 
+    if (isset($email) && isset($pwd)) {
+        $query = "SELECT display_name, user_id FROM user
+          WHERE email_address=:email AND 
           password=:password";
         try {
             $db = getDB();
             $stmt = $db->prepare($query);
-            $stmt->execute([':username' => $user, ':password' => $pwd]);
+            $stmt->execute([':email' => $email, ':password' => $pwd]);
             $check = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (!empty($check)) {
                 $userID = $check[0]['user_id'];
@@ -31,7 +31,7 @@ $app->post('/login', function (ServerRequestInterface $request, ResponseInterfac
                     $hist = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     // The user has history
                     if ($hist) {
-                        $hist['user_id'] = $userID;
+                        $hist['displayName'] = $check[0]['display_name'];
                         return $response->withJSON(json_encode($hist));
                     }
                     // The user does not have history
@@ -54,30 +54,29 @@ $app->post('/login', function (ServerRequestInterface $request, ResponseInterfac
 });
 
 $app->post('/register', function (ServerRequestInterface $request, ResponseInterface $response) {
-    $user = $request->getParsedBody()['username'];
-    $firstName = $request->getParsedBody()['firstName'];
-    $lastName = $request->getParsedBody()['lastName'];
+    $email = $request->getParsedBody()['emailAddress'];
     $pwd = $request->getParsedBody()['password'];
+    $displayName = $request->getParsedBody()['displayName'];
 
-    if (isset($user) && isset($pwd) && isset($firstName) && isset($lastName)) {
-        $query = "INSERT INTO user (first_name, last_name, email_address, password) 
-            VALUES (?, ?, ?, ?)";
+
+    if (isset($email) && isset($pwd) && isset($displayName)) {
+        $query = "INSERT INTO user (display_name, email_address, password) 
+            VALUES (?, ?, ?)";
         try {
             $db = getDB();
             $stmt = $db->prepare($query);
             $status = $stmt->execute([
-                $firstName,
-                $lastName,
-                $user,
+                $displayName,
+                $email,
                 $pwd
             ]);
 
             if ($status) {
                 $query2 = "SELECT user_id FROM user
-                  WHERE email_address=:username AND 
+                  WHERE email_address=:email AND 
                   password=:password";
                 $stmt = $db->prepare($query2);
-                $stmt->execute([':username' => $user, ':password' => $pwd]);
+                $stmt->execute([':email' => $email, ':password' => $pwd]);
                 $check = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $user_id = json_encode($check[0]);
                 return $response->withJSON($user_id);
