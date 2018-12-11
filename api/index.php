@@ -247,11 +247,12 @@ $app->post("/register", function ($req, $res) {
                     "errorMessage" => "Expected a string for password"
                 ]);
         }
-        if (strlen($password) < 10) {
+        //Longer is better but 6 is good for testing
+        if (strlen($password) < 6) {
             return $res
                 ->withStatus(400)
                 ->withJson([
-                    "errorMessage" => "Password must be 10 characters or more"
+                    "errorMessage" => "Password must be 6 characters or more"
                 ]);
         }
         if (!is_string($displayName)) {
@@ -261,11 +262,12 @@ $app->post("/register", function ($req, $res) {
                     "errorMessage" => "Expected a string for display name"
                 ]);
         }
-        if (strlen($displayName) < 5) {
+        //For people with really short names
+        if (strlen($displayName) < 2) {
             return $res
                 ->withStatus(400)
                 ->withJson([
-                    "errorMessage" => "Display name must be 5 characters or more"
+                    "errorMessage" => "Display name must be 2 characters or more"
                 ]);
         }
         $user = register(
@@ -373,6 +375,8 @@ $app->post("/me/place/{placeId}/match", function ($req, $res, $args) {
         }
         $body = $req->getParsedBody();
         $body["placeId"] = $args["placeId"];
+        $body["rating"] = isset($body["rating"]) ? $body["rating"] : null;
+        $body["priceLevel"] = isset($body["priceLevel"]) ? $body["priceLevel"] : null;
 
         $placeId = $body["placeId"];
         $name = $body["name"];
@@ -395,7 +399,11 @@ $app->post("/me/place/{placeId}/match", function ($req, $res, $args) {
         }
         if (
             !is_null($rating) &&
-            (!is_float($rating) || $rating < 1 || $rating > 5)
+            (
+                (!is_float($rating) && !is_int($rating)) ||
+                $rating < 1 ||
+                $rating > 5
+            )
         ) {
             return $res
                 ->withStatus(400)
