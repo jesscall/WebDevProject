@@ -1,14 +1,13 @@
 <?php
-require_once("dbconfig.php");
+    require_once("dbconfig.php");
 
-function getDB() {
     $dbhost = DB_HOST;
     $dbuser = DB_USER;
     $dbpass = DB_PASS;
     $dbname = DB_NAME;
 
     $dbConnection = new PDO(
-        "mysql:host=$dbhost;dbname=$dbname",
+        "mysql:host=$dbhost;dbname=$dbname;charset=utf8mb4",
         $dbuser,
         $dbpass
     );
@@ -19,5 +18,8 @@ function getDB() {
     );
 
     return $dbConnection;
-}
+    function getDB() {
+        global $dbConnection;
+        return $dbConnection;
+    }
 ?>

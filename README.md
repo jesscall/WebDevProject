@@ -1,8 +1,11 @@
+### DB Set Up
+
+1. Log into mysql using `mysql -u root -p` (Or a different username)
+2. Create a new database: `CREATE DATABASE project`
+3. `source sql/structure.sql`
+
 ### DB Configuration
 
-1. Log into mysql using `mysql -u root -p`
-2. Creat a new database: `CREATE DATABASE project`.
-3. Use the files in `tables_sql` directory to set up the database.
 4. `cp api/dbconfig.sample.php api/dbconfig.php`
 2. `nano api/dbconfig.php`
 3. Modify the `DB_PASS` constant and any other constants as needed
@@ -10,3 +13,11 @@
 
 ### Hosting
 Please host on XAMPP. Follow any other configuration instructions for frontend setup.
+
+### Note on Apache2
+
+The `api/.htaccess` file uses the `Header` command.
+This requires the `headers` module to be enabled.
+
+You may enable it using `a2enmod headers`.
+Restart apache2 after this.
