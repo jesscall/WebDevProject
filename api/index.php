@@ -172,7 +172,7 @@ function register ($emailAddress, $password, $displayName) {
         return null;
     }
 
-    //Higher cost is better. But 10 because my hardware is bad
+    //Higher cost is more secure
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT, [ "cost" => 10 ]);
 
     $db = getDB();
