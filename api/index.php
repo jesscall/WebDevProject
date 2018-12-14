@@ -87,6 +87,14 @@ function getUser ($authenticationToken) {
     ");
     $stmt->execute([":userId" => $user->userId]);
     $user->matches = $stmt->fetchAll();
+    foreach ($user->matches as &$m) {
+        $m["rating"] = is_string($m["rating"]) ?
+            (float)$m["rating"] :
+            $m["rating"];
+        $m["priceLevel"] = is_string($m["priceLevel"]) ?
+            (int)$m["priceLevel"] :
+            $m["priceLevel"];
+    }
     return $user;
 }
 
@@ -164,7 +172,8 @@ function register ($emailAddress, $password, $displayName) {
         return null;
     }
 
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT, [ "cost" => 14 ]);
+    //Higher cost is better. But 10 because my hardware is bad
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT, [ "cost" => 10 ]);
 
     $db = getDB();
     $stmt = $db->prepare("
